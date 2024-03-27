@@ -2,7 +2,15 @@ import "../pages/index.css";
 import { closeModal, openModal } from "./modal.js";
 import { initialCards } from "./cards.js";
 import { createCard, deleteCard, likeCard } from "./card.js";
-
+import { enableValidation, clearValidation } from "./validation.js";
+const config = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "popup__input_type_error",
+  errorClass: "popup__error_visible",
+};
 const editForm = document
   .querySelector(".popup_type_edit")
   .querySelector(".popup__form");
@@ -34,12 +42,14 @@ function modalAct(evt) {
     const popup = document.querySelector(".popup_type_new-card");
     popup.querySelector(".popup__form").reset();
     openModal(popup);
+    clearValidation(popup, config);
   }
   if (evt.target == document.querySelector(".profile__edit-button")) {
     const popup = document.querySelector(".popup_type_edit");
     popup.querySelector(".popup__input_type_name").value = title.textContent;
     popup.querySelector(".popup__input_type_description").value =
       description.textContent;
+    clearValidation(popup, config);
     openModal(popup);
   }
 }
@@ -79,3 +89,5 @@ document.querySelectorAll(".popup__close").forEach(function (button) {
   const popup = button.closest(".popup");
   button.addEventListener("click", () => closeModal(popup));
 });
+
+enableValidation(config);
