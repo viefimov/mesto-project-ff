@@ -1,8 +1,14 @@
 import "../pages/index.css";
 import { closeModal, openModal } from "./modal.js";
-import { initialCards } from "./cards.js";
 import { createCard, deleteCard, likeCard } from "./card.js";
 import { enableValidation, clearValidation } from "./validation.js";
+import {
+  getProfile,
+  getInitialCards,
+  postCard,
+  patchAvatar,
+  patchProfile,
+} from "./api.js";
 const config = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
@@ -16,6 +22,9 @@ const editForm = document
   .querySelector(".popup__form");
 const addForm = document
   .querySelector(".popup_type_new-card")
+  .querySelector(".popup__form");
+const editAvatarForm = document
+  .querySelector(".popup_type_edit-avatar")
   .querySelector(".popup__form");
 const title = document.querySelector(".profile__title");
 const cardList = document.querySelector(".places__list");
@@ -32,10 +41,24 @@ function openImage(evt) {
     openModal(popup);
   }
 }
-
-initialCards.forEach(function (card) {
-  cardList.append(createCard(card, deleteCard, likeCard, openImage));
-});
+Promise.all([
+  getProfile(
+    document.querySelector(".profile__image"),
+    document.querySelector(".profile__title"),
+    document.querySelector(".profile__description")
+  ),
+  getInitialCards(),
+])
+  .then(([userInfo, cards]) => {
+    cards.forEach((card) => {
+      cardList.append(
+        createCard(card, deleteCard, likeCard, openImage, userInfo._id)
+      );
+    });
+  })
+  .catch((error) => {
+    console.error("Ошибка при загрузке данных:", error);
+  });
 
 function modalAct(evt) {
   if (evt.target == document.querySelector(".profile__add-button")) {
@@ -52,6 +75,12 @@ function modalAct(evt) {
     clearValidation(popup, config);
     openModal(popup);
   }
+  if (evt.target == document.querySelector(".profile__image-button")) {
+    const popup = document.querySelector(".popup_type_edit-avatar");
+    popup.querySelector(".popup__form").reset();
+    openModal(popup);
+    clearValidation(popup, config);
+  }
 }
 
 function editProfile(evt) {
@@ -60,17 +89,46 @@ function editProfile(evt) {
     editForm.querySelector(".popup__input_type_name").value;
   document.querySelector(".profile__description").textContent =
     editForm.querySelector(".popup__input_type_description").value;
+  patchProfile(
+    editForm.querySelector(".popup__input_type_name").value,
+    editForm.querySelector(".popup__input_type_description").value
+  );
+  closeModal(document.querySelector(".popup_is-opened"));
+}
+function editAvatar(evt) {
+  evt.preventDefault();
+  const link = editAvatarForm.querySelector(".popup__input_type_url").value;
+  document
+    .querySelector(".profile__image")
+    .setAttribute("style", `background-image: url('${link}')`);
+  patchAvatar(`${link}`);
   closeModal(document.querySelector(".popup_is-opened"));
 }
 
 function addCard(evt) {
   evt.preventDefault();
-  const newCard = {
+  const newCardData = {
     name: addForm.querySelector(".popup__input_type_card-name").value,
     link: addForm.querySelector(".popup__input_type_url").value,
   };
-  cardList.prepend(createCard(newCard, deleteCard, likeCard, openImage));
-  closeModal(document.querySelector(".popup_is-opened"));
+  postCard(newCardData)
+    .then((newCard) => {
+      const newCardElement = createCard(
+        newCard,
+        deleteCard,
+        likeCard,
+        openImage,
+        newCard.owner._id
+      );
+      cardList.prepend(newCardElement);
+    })
+    .catch((error) => {
+      console.error("Error adding new card:", error);
+    })
+    .finally(() => {
+      // Close the modal after handling the result
+      closeModal(document.querySelector(".popup_is-opened"));
+    });
 }
 
 document
@@ -80,10 +138,14 @@ document
 document
   .querySelector(".profile__edit-button")
   .addEventListener("click", modalAct);
+document
+  .querySelector(".profile__image-button")
+  .addEventListener("click", modalAct);
 
 editForm.addEventListener("submit", editProfile);
 
 addForm.addEventListener("submit", addCard);
+editAvatarForm.addEventListener("submit", editAvatar);
 
 document.querySelectorAll(".popup__close").forEach(function (button) {
   const popup = button.closest(".popup");
