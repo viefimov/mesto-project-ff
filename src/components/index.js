@@ -112,10 +112,15 @@ function editAvatar(evt) {
   document
     .querySelector(".profile__image")
     .setAttribute("style", `background-image: url('${link}')`);
-  patchAvatar(`${link}`).then(() => {
-    submitButton.textContent = "Сохранить";
-    closeModal(document.querySelector(".popup_is-opened"));
-  });
+  patchAvatar(`${link}`)
+    .then(() => {
+      submitButton.textContent = "Сохранить";
+      closeModal(document.querySelector(".popup_is-opened"));
+    })
+    .catch((error) => {
+      console.error("Ошибка изменения профиля:", error);
+      submitButton.textContent = "Сохранить";
+    });
 }
 
 function addCard(evt) {
@@ -142,7 +147,8 @@ function addCard(evt) {
       closeModal(document.querySelector(".popup_is-opened"));
     })
     .catch((error) => {
-      console.error("Error adding new card:", error);
+      console.error("Ошибка изменения профиля:", error);
+      submitButton.textContent = "Сохранить";
     });
 }
 
