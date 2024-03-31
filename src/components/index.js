@@ -85,6 +85,8 @@ function modalAct(evt) {
 
 function editProfile(evt) {
   evt.preventDefault();
+  const submitButton = editForm.querySelector(".popup__button");
+  submitButton.textContent = "Сохранить...";
   document.querySelector(".profile__title").textContent =
     editForm.querySelector(".popup__input_type_name").value;
   document.querySelector(".profile__description").textContent =
@@ -92,21 +94,34 @@ function editProfile(evt) {
   patchProfile(
     editForm.querySelector(".popup__input_type_name").value,
     editForm.querySelector(".popup__input_type_description").value
-  );
-  closeModal(document.querySelector(".popup_is-opened"));
+  )
+    .then(() => {
+      submitButton.textContent = "Сохранить";
+      closeModal(document.querySelector(".popup_is-opened"));
+    })
+    .catch((error) => {
+      console.error("Ошибка изменения профиля:", error);
+      submitButton.textContent = "Сохранить";
+    });
 }
 function editAvatar(evt) {
   evt.preventDefault();
+  const submitButton = editAvatarForm.querySelector(".popup__button");
+  submitButton.textContent = "Сохранить...";
   const link = editAvatarForm.querySelector(".popup__input_type_url").value;
   document
     .querySelector(".profile__image")
     .setAttribute("style", `background-image: url('${link}')`);
-  patchAvatar(`${link}`);
-  closeModal(document.querySelector(".popup_is-opened"));
+  patchAvatar(`${link}`).then(() => {
+    submitButton.textContent = "Сохранить";
+    closeModal(document.querySelector(".popup_is-opened"));
+  });
 }
 
 function addCard(evt) {
   evt.preventDefault();
+  const submitButton = addForm.querySelector(".popup__button");
+  submitButton.textContent = "Сохранить...";
   const newCardData = {
     name: addForm.querySelector(".popup__input_type_card-name").value,
     link: addForm.querySelector(".popup__input_type_url").value,
@@ -122,12 +137,12 @@ function addCard(evt) {
       );
       cardList.prepend(newCardElement);
     })
+    .then(() => {
+      submitButton.textContent = "Сохранить";
+      closeModal(document.querySelector(".popup_is-opened"));
+    })
     .catch((error) => {
       console.error("Error adding new card:", error);
-    })
-    .finally(() => {
-      // Close the modal after handling the result
-      closeModal(document.querySelector(".popup_is-opened"));
     });
 }
 
