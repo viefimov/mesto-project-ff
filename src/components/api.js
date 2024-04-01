@@ -5,21 +5,23 @@ const configApi = {
     "Content-Type": "application/json",
   },
 };
-export const getProfile = (avatar, name, about) => {
+const handleResponse = (res) => {
+  if (!res.ok) {
+    throw new Error("Ошибка");
+  }
+};
+export const getProfile = () => {
   return fetch(configApi.baseUrl + "/users/me", {
     headers: {
       authorization: configApi.headers.authorization,
     },
   })
-    .then((res) => res.json())
-    .then((userInfo) => {
-      avatar.setAttribute(
-        "style",
-        `background-image: url('${userInfo.avatar}')`
-      );
-      name.textContent = userInfo.name;
-      about.textContent = userInfo.about;
-      return userInfo;
+    .then((res) => {
+      handleResponse(res);
+      return res.json();
+    })
+    .catch((error) => {
+      console.error(error);
     });
 };
 
@@ -29,9 +31,12 @@ export const getInitialCards = () => {
       authorization: configApi.headers.authorization,
     },
   })
-    .then((res) => res.json())
-    .then((result) => {
-      return result;
+    .then((res) => {
+      handleResponse(res);
+      return res.json();
+    })
+    .catch((error) => {
+      console.error(error);
     });
 };
 
@@ -41,11 +46,9 @@ export const postCard = (cardData) => {
     headers: configApi.headers,
     body: JSON.stringify(cardData),
   })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Не удалось добавить карточку");
-      }
-      return response.json();
+    .then((res) => {
+      handleResponse(res);
+      return res.json();
     })
     .catch((error) => {
       console.error("Ошибка добавления новой карточки:", error);
@@ -59,41 +62,49 @@ export const deleteCardApi = (cardId) => {
       authorization: configApi.headers.authorization,
     },
   })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Не удалось удалить карточку");
-      }
-      return response.json();
+    .then((res) => {
+      handleResponse(res);
+      return res.json();
     })
     .catch((error) => {
       console.error("Ошибка удаления новой карточки:", error);
       throw error;
     });
 };
-export const likeCardApi = (likeCount, cardId) => {
+export const likeCardApi = (cardId) => {
   return fetch(`${configApi.baseUrl}/cards/likes/${cardId}`, {
     method: "PUT",
     headers: {
       authorization: configApi.headers.authorization,
     },
   })
-    .then((res) => res.json())
+    .then((res) => {
+      handleResponse(res);
+      return res.json();
+    })
     .then((card) => {
-      likeCount.textContent = card.likes.length;
       return card;
+    })
+    .catch((error) => {
+      console.error(error);
     });
 };
-export const dislikeCardApi = (likeCount, cardId) => {
+export const dislikeCardApi = (cardId) => {
   return fetch(`${configApi.baseUrl}/cards/likes/${cardId}`, {
     method: "DELETE",
     headers: {
       authorization: configApi.headers.authorization,
     },
   })
-    .then((res) => res.json())
+    .then((res) => {
+      handleResponse(res);
+      return res.json();
+    })
     .then((card) => {
-      likeCount.textContent = card.likes.length;
       return card;
+    })
+    .catch((error) => {
+      console.error(error);
     });
 };
 export const patchAvatar = (avatar) => {
@@ -105,9 +116,15 @@ export const patchAvatar = (avatar) => {
     headers: configApi.headers,
     body: requestBody,
   })
-    .then((res) => res.json())
+    .then((res) => {
+      handleResponse(res);
+      res.json();
+    })
     .then((result) => {
       return result;
+    })
+    .catch((error) => {
+      console.error(error);
     });
 };
 export const patchProfile = (name, about) => {
@@ -120,8 +137,14 @@ export const patchProfile = (name, about) => {
     headers: configApi.headers,
     body: requestBody,
   })
-    .then((res) => res.json())
+    .then((res) => {
+      handleResponse(res);
+      res.json();
+    })
     .then((result) => {
       return result;
+    })
+    .catch((error) => {
+      console.error(error);
     });
 };

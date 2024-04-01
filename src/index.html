@@ -25,8 +25,7 @@
             style="background-image: url('<%=require(`./images/avatar.jpg`)%>')"
           >
             <span class="profile__image-span">
-             <button type="button" class="profile__image-button"></button>
-              
+              <button type="button" class="profile__image-button"></button>
             </span>
           </div>
           <div class="profile__info">
@@ -54,7 +53,7 @@
               id="popup__input_type_name"
               class="popup__input popup__input_type_name"
               placeholder="Имя"
-              pattern="^[A-Za-zА-Яа-яЁё-\s\-]+$"
+              pattern="^[A-Za-zА-Яа-яЁё\s-]+$"
               data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
               minlength="2"
               maxlength="40"
@@ -92,7 +91,7 @@
             <input
               type="text"
               name="place-name"
-              pattern="^[A-Za-zА-Яа-яЁё-\s\-]+$"
+              pattern="^[A-Za-zА-Яа-яЁё\s-]+$"
               data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
               id="popup__input_type_card-name"
               class="popup__input popup__input_type_card-name"

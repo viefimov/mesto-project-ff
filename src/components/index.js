@@ -41,15 +41,14 @@ function openImage(evt) {
     openModal(popup);
   }
 }
-Promise.all([
-  getProfile(
-    document.querySelector(".profile__image"),
-    document.querySelector(".profile__title"),
-    document.querySelector(".profile__description")
-  ),
-  getInitialCards(),
-])
+Promise.all([getProfile(), getInitialCards()])
   .then(([userInfo, cards]) => {
+    document
+      .querySelector(".profile__image")
+      .setAttribute("style", `background-image: url('${userInfo.avatar}')`);
+    document.querySelector(".profile__title").textContent = userInfo.name;
+    document.querySelector(".profile__description").textContent =
+      userInfo.about;
     cards.forEach((card) => {
       cardList.append(
         createCard(card, deleteCard, likeCard, openImage, userInfo._id)
@@ -96,11 +95,12 @@ function editProfile(evt) {
     editForm.querySelector(".popup__input_type_description").value
   )
     .then(() => {
-      submitButton.textContent = "Сохранить";
       closeModal(document.querySelector(".popup_is-opened"));
     })
     .catch((error) => {
       console.error("Ошибка изменения профиля:", error);
+    })
+    .finally(() => {
       submitButton.textContent = "Сохранить";
     });
 }
@@ -114,11 +114,12 @@ function editAvatar(evt) {
     .setAttribute("style", `background-image: url('${link}')`);
   patchAvatar(`${link}`)
     .then(() => {
-      submitButton.textContent = "Сохранить";
       closeModal(document.querySelector(".popup_is-opened"));
     })
     .catch((error) => {
       console.error("Ошибка изменения профиля:", error);
+    })
+    .finally(() => {
       submitButton.textContent = "Сохранить";
     });
 }
@@ -143,11 +144,12 @@ function addCard(evt) {
       cardList.prepend(newCardElement);
     })
     .then(() => {
-      submitButton.textContent = "Сохранить";
       closeModal(document.querySelector(".popup_is-opened"));
     })
     .catch((error) => {
       console.error("Ошибка изменения профиля:", error);
+    })
+    .finally(() => {
       submitButton.textContent = "Сохранить";
     });
 }

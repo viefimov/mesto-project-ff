@@ -1,20 +1,37 @@
-import { deleteCardApi, likeCardApi, dislikeCardApi, getLikes } from "./api.js";
+import { deleteCardApi, likeCardApi, dislikeCardApi } from "./api.js";
 
 const cardTemplate = document.querySelector("#card-template").content;
 
 export function likeCard(likeCount, likeButton, cardId) {
   if (likeButton.classList.contains("card__like-button_is-active")) {
-    likeButton.classList.remove("card__like-button_is-active");
-    dislikeCardApi(likeCount, cardId);
+    dislikeCardApi(cardId)
+      .then((card) => {
+        likeCount.textContent = card.likes.length;
+        likeButton.classList.remove("card__like-button_is-active");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   } else if (!likeButton.classList.contains("card__like-button_is-active")) {
-    likeButton.classList.add("card__like-button_is-active");
-    likeCardApi(likeCount, cardId);
+    likeCardApi(cardId)
+      .then((card) => {
+        likeCount.textContent = card.likes.length;
+        likeButton.classList.add("card__like-button_is-active");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }
 
 export function deleteCard(cardElement, cardId) {
-  cardElement.remove();
-  deleteCardApi(cardId);
+  deleteCardApi(cardId)
+    .then(() => {
+      cardElement.remove();
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 export function createCard(cardData, deleteCard, likeCard, openImage, userId) {
   const cardElement = cardTemplate.querySelector(".card").cloneNode(true);
